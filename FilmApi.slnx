@@ -1,6 +1,8 @@
 <Solution>
-  <Project Path="AppHost/AppHost.csproj" />
+  <Folder Name="/_do_not_touch/">
+    <Project Path="AppHost/AppHost.csproj" />
+    <Project Path="SeedFilms/SeedFilms.csproj" />
+  </Folder>
   <Project Path="src/FilmApi/FilmApi.csproj" />
   <Project Path="tests/FilmApi.Tests/FilmApi.Tests.csproj" />
-  <Project Path="SeedFilms/SeedFilms.csproj" />
 </Solution>
