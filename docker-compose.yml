@@ -1,0 +1,100 @@
+# k6 + InfluxDB 2 + Grafana stack (2026)
+# Run: docker compose up -d
+# Then run k6 with InfluxDB output (see README).
+
+services:
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: iut-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD:-adminpassword}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG:-k6}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET:-k6}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-k6-influxdb-token}
+      DOCKER_INFLUXDB_INIT_RETENTION: 7d
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8086/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: iut-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3000}
+      GF_INSTALL_PLUGINS: ""
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      # Anonymous access: no login required
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo:
+    image: mongo:7.0
+    container_name: iut-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  k6:
+    build:
+      context: .
+      dockerfile: Dockerfile.k6
+    image: iut-k6:latest
+    container_name: iut-k6
+    # Use host network so k6 can reach localhost (app on your machine)
+    network_mode: host
+    depends_on:
+      influxdb:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    environment:
+      K6_INFLUXDB_ORGANIZATION: ${INFLUXDB_ORG:-k6}
+      K6_INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-k6}
+      K6_INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-k6-influxdb-token}
+      K6_INFLUXDB_ADDR: http://127.0.0.1:8086
+      BASE_URL: ${BASE_URL:-https://httpbin.test.k6.io}
+      # Nombre d'éléments en base (pour pagination aléatoire) ; fourni à l'exécution ou dans .env
+      TOTAL_ITEMS: ${TOTAL_ITEMS:-}
+      PAGE_SIZE: ${PAGE_SIZE:-100}
+    volumes:
+      - ./k6:/scripts:ro
+    profiles:
+      - run
+    # Example: docker compose --profile run run k6 run /scripts/load-test.js -o xk6-influxdb
+
+volumes:
+  influxdb-data:
+  grafana-data:
+  mongo-data:
+

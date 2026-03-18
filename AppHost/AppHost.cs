@@ -5,14 +5,15 @@ var mongoPassword = builder.AddParameter("mongo-password", "filmapi", secret: tr
 
 var mongo = builder.AddMongoDB("mongo", userName: mongoUser, password: mongoPassword)
     .WithDataVolume()
-    .WithLifetime(ContainerLifetime.Persistent);
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEndpoint(port: 27017, targetPort: 27017, name: "mongo-external");
 
 var mongodb = mongo.AddDatabase("mongodb");
 
 builder.AddProject<Projects.FilmApi>("filmApi")
     .WaitFor(mongodb)
     .WithReference(mongodb)
-    .WithUrl("/swagger");
+    .WithUrl("/swagger"); // Trust launchSettings for 1803
 
 builder.AddProject<Projects.SeedFilms>("seed-50k")
     .WaitFor(mongodb)
