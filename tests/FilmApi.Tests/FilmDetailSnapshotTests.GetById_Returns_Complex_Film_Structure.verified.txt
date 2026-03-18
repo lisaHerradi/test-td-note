@@ -1,0 +1,43 @@
+{
+  Id: {Scrubbed},
+  Title: Dune,
+  Summary: Sur la planète Arrakis...,
+  Year: 2021,
+  DurationMinutes: 155,
+  ReleaseDate: {Scrubbed},
+  Director: {
+    Id: {Scrubbed},
+    LastName: Villeneuve,
+    FirstName: Denis,
+    Nationality: CA,
+    BirthDate: {Scrubbed}
+  },
+  Genres: [
+    {
+      Id: {Scrubbed},
+      Name: Science-Fiction
+    },
+    {
+      Id: {Scrubbed},
+      Name: Aventure
+    }
+  ],
+  Actors: [
+    {
+      Id: {Scrubbed},
+      LastName: Chalamet,
+      FirstName: Timothée,
+      Role: Paul Atréides
+    },
+    {
+      Id: {Scrubbed},
+      LastName: Zendaya,
+      FirstName: ,
+      Role: Chani
+    }
+  ],
+  ProductionCountry: {
+    Code: US,
+    Name: États-Unis
+  }
+}
