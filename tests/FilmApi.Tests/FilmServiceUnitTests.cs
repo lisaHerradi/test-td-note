@@ -15,6 +15,7 @@ public class FilmServiceUnitTests
     [Fact]
     public async Task CreateAsync_Calls_Repository_AddAsync_And_Returns_Film()
     {
+        //Arrange
         var substituteRepo = Substitute.For<IFilmRepository>();
         
         var director = new DirectorBuilder()
@@ -63,8 +64,11 @@ public class FilmServiceUnitTests
             Actors: new List<Actor>(),
             ProductionCountry: country
         );
-        var result = await service.CreateAsync(request);
 
+        //Act
+        var result = await service.CreateAsync(request);
+        
+        //Assert
         Assert.Equal("film1", result.Id);
         Assert.Equal("Dune", result.Title);
         Assert.Equal(2021, result.Year);
@@ -76,6 +80,7 @@ public class FilmServiceUnitTests
     [Fact]
     public async Task GetByIdAsync_Returns_Film_When_Exists()
     {
+        //Arrange
         var substituteRepo = Substitute.For<IFilmRepository>();
         
         var director = new DirectorBuilder()
@@ -96,8 +101,11 @@ public class FilmServiceUnitTests
         substituteRepo.GetByIdAsync("f2").Returns(film);
 
         var service = new FilmService(substituteRepo);
+        
+        //Act
         var result = await service.GetByIdAsync("f2");
 
+        //Assert
         Assert.NotNull(result);
         Assert.Equal("Inception", result.Title);
         Assert.Equal("Nolan", result.Director.LastName);
@@ -106,12 +114,15 @@ public class FilmServiceUnitTests
     [Fact]
     public async Task DeleteAsync_Returns_True_When_Repository_Deletes()
     {
+        //Arrange
         var substituteRepo = Substitute.For<IFilmRepository>();
         substituteRepo.DeleteByIdAsync("f1").Returns(true);
         var service = new FilmService(substituteRepo);
 
+        //Act
         var result = await service.DeleteAsync("f1");
 
+        //Assert
         Assert.True(result);
         await substituteRepo.Received(1).DeleteByIdAsync("f1");
     }
@@ -119,12 +130,15 @@ public class FilmServiceUnitTests
     [Fact]
     public async Task DeleteAsync_Returns_False_When_Not_Found()
     {
+        //Arrange
         var substituteRepo = Substitute.For<IFilmRepository>();
         substituteRepo.DeleteByIdAsync("missing").Returns(false);
         var service = new FilmService(substituteRepo);
 
+        //Act
         var result = await service.DeleteAsync("missing");
 
+        //Assert
         Assert.False(result);
     }
 }
