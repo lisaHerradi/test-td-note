@@ -1,0 +1,14 @@
+Using launch settings from AppHost/Properties/launchSettings.json...
+Building...
+info: Aspire.Hosting.DistributedApplication[0]
+      Aspire version: 13.1.2+895a2f0b09d747a052aaaf0273d55ad0e2dc95b0
+info: Aspire.Hosting.DistributedApplication[0]
+      Distributed application starting.
+info: Aspire.Hosting.DistributedApplication[0]
+      Application host directory is: /home/mythra/Documents/S6/tests/test-td-note/AppHost
+info: Aspire.Hosting.DistributedApplication[0]
+      Now listening on: https://localhost:17020
+info: Aspire.Hosting.DistributedApplication[0]
+      Login to the dashboard at https://localhost:17020/login?t=9f76ab3452417855f358f9ba59b73324
+info: Aspire.Hosting.DistributedApplication[0]
+      Distributed application started. Press Ctrl+C to shut down.
